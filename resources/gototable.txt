@@ -1,0 +1,25 @@
+0 ;STM ;1
+
+5 ;STM ;8
+
+6 ;EXP ;9
+
+7 ;EXP ;14
+7 ;EXPLIST ;13
+
+9 ;BINOP ;15
+
+12 ;STM ;20
+
+14 ;BINOP ;15
+
+15 ;EXP ;23
+
+22 ;EXP ;14
+22 ;EXPLIST ;25
+
+23 ;BINOP ;15
+
+24 ;EXP ;26
+
+26 ;BINOP ;15

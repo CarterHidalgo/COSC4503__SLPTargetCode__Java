@@ -65,7 +65,7 @@ public class TargetCodeVisitor implements Visitor {
         addNewlineCode();
         
         return reg;
-    }
+    }//change
 
     public Object visit(EseqExp eseqExp, Object inh) {
         eseqExp.stm.accept(this, inh);

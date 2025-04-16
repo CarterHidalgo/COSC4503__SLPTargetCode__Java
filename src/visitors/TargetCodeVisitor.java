@@ -12,8 +12,6 @@ import intermediates.NumExp;
 import intermediates.OpExp;
 import intermediates.PairExpList;
 import intermediates.PrintStm;
-import register.Register;
-import register.RegisterManager;
 
 public class TargetCodeVisitor implements Visitor {
     private Set<String> symbols = new HashSet<>();
@@ -37,9 +35,9 @@ public class TargetCodeVisitor implements Visitor {
     }
 
     public Object visit(AssignStm assignStm, Object inh) {
-        Register reg = (Register) assignStm.exp.accept(this, inh);
+        String reg = (String) assignStm.exp.accept(this, inh);
         text.append("sw " + reg + ", " + assignStm.id.accept(this, inh) + "\n");
-        RegisterManager.add(reg);
+        Registers.add(reg);
 
         return null;
     }
@@ -49,23 +47,22 @@ public class TargetCodeVisitor implements Visitor {
     }
 
     public Object visit(PairExpList pairExpList, Object inh) {
-        Register regHead = (Register) pairExpList.head.accept(this, inh);
+        String regHead = (String) pairExpList.head.accept(this, inh);
         addPrintCode(regHead);
-        RegisterManager.add(regHead);
+        Registers.add(regHead);
 
-        Register regTail = (Register) pairExpList.tail.accept(this, inh);
-        RegisterManager.add(regTail);
+        Registers.add((String) pairExpList.tail.accept(this, inh));
 
         return null;
     }
 
     public Object visit(LastExpList lastExpList, Object inh) {
-        Register reg = (Register) lastExpList.head.accept(this, inh);
+        String reg = (String) lastExpList.head.accept(this, inh);
         addPrintCode(reg);
         addNewlineCode();
         
         return reg;
-    }//change
+    }
 
     public Object visit(EseqExp eseqExp, Object inh) {
         eseqExp.stm.accept(this, inh);
@@ -80,7 +77,7 @@ public class TargetCodeVisitor implements Visitor {
             
             return idExp.id;
         } else {
-            Register reg = RegisterManager.get('t', null);
+            String reg = Registers.get();
             text.append("lw " + reg + ", " + idExp.id + "\n");
             
             return reg;
@@ -88,25 +85,25 @@ public class TargetCodeVisitor implements Visitor {
     }
 
     public Object visit(NumExp numExp, Object inh) {
-        Register reg = RegisterManager.get('t', numExp.num);
-        text.append("li " + reg + ", " + reg.getValue() + "\n");
+        String reg = Registers.get();
+        text.append("li " + reg + ", " + numExp.num + "\n");
 
         return reg;
     }
 
     public Object visit(OpExp opExp, Object inh) {
-        Register argLeft = (Register) opExp.left.accept(this, inh);
-        Register argRight = (Register) opExp.right.accept(this, inh);
-        Register result = RegisterManager.get('t', null);
-        String post = result + ", "
+        String argLeft = (String) opExp.left.accept(this, inh);
+        String argRight = (String) opExp.right.accept(this, inh);
+        String result = Registers.get();
+        String postfix = result + ", "
                 + argLeft + ", "
                 + argRight + "\n";
 
         switch (opExp.oper) {
-            case OpExp.ADD -> text.append("add " + post);
-            case OpExp.SUB -> text.append("sub " + post);
-            case OpExp.MUL -> text.append("mul " + post);
-            case OpExp.DIV -> text.append("div " + post);
+            case OpExp.ADD -> text.append("add " + postfix);
+            case OpExp.SUB -> text.append("sub " + postfix);
+            case OpExp.MUL -> text.append("mul " + postfix);
+            case OpExp.DIV -> text.append("div " + postfix);
             default -> throw new IllegalStateException("Unexpected operator enum value: " + opExp.oper);
         };
 
@@ -119,7 +116,7 @@ public class TargetCodeVisitor implements Visitor {
         return data.toString() + "\n" + text.toString();
     }
 
-    private void addPrintCode(Register reg) {
+    private void addPrintCode(String reg) {
         text.append("li $v0, 1\n");
         text.append("move $a0, " + reg + "\n");
         text.append("syscall\n");

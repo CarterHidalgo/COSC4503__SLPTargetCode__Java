@@ -1,4 +1,4 @@
-package intermediates;
+package ast;
 import visitors.Visitor;
 
 public class OpExp extends Exp {
@@ -12,7 +12,12 @@ public class OpExp extends Exp {
         this.right = right;
     }
 
-    public Object accept(Visitor v, Object inh) {
-        return v.visit(this, inh);
+    public Object accept(Visitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "OpExp(" + this.left + ", " + this.oper + ", " + this.right + ")";
     }
 }

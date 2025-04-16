@@ -7,16 +7,8 @@ public class State implements StackItem {
         this.state = state;
     }
 
-    public int state() {
+    public Integer value() {
         return state;
-    }
-
-    public String value() {
-        return String.valueOf(this.state);
-    }
-
-    public String typeString() {
-        return "";
     }
 
     @Override

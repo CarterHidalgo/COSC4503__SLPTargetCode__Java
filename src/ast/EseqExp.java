@@ -1,4 +1,4 @@
-package intermediates;
+package ast;
 import visitors.Visitor;
 
 public class EseqExp extends Exp {
@@ -10,7 +10,12 @@ public class EseqExp extends Exp {
         this.exp = exp;
     }
 
-    public Object accept(Visitor v, Object inh) {
-        return v.visit(this, inh);
+    public Object accept(Visitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "EseqExp(" + this.stm + ", " + this.exp + ")";
     }
 }

@@ -1,4 +1,4 @@
-package intermediates;
+package ast;
 import visitors.Visitor;
 
 public class CompoundStm extends Stm {
@@ -9,7 +9,12 @@ public class CompoundStm extends Stm {
         this.stm2 = stm2;
     }
 
-    public Object accept(Visitor v, Object inh) {
-        return v.visit(this, inh);
+    public Object accept(Visitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "CompoundStm(" + this.stm1 + ", " + this.stm2 + ")";
     }
 }

@@ -1,6 +1,5 @@
 package parser;
 
-interface StackItem {
-    String value();
-    String typeString();
+public interface StackItem {
+    Object value();
 }

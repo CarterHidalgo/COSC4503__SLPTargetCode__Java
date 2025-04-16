@@ -81,7 +81,7 @@ public class Lexer {
 
     public Token nextToken() {
         while(!this.list.isEmpty() && this.list.peek().type().equals(Token.Type.LINE)) {
-            this.lineNumber = Integer.valueOf(this.list.remove().value());
+            this.lineNumber = Integer.valueOf(this.list.remove().value().toString());
         }
 
         return this.list.isEmpty() ? new Token(Token.Type.EOF, "") : this.list.remove();
@@ -92,7 +92,7 @@ public class Lexer {
             this.list.remove();
         }
         while (!this.list.isEmpty() && this.list.peek().type().equals(Token.Type.LINE)) {
-            lineNumber = Integer.valueOf(this.list.remove().value());
+            lineNumber = Integer.valueOf(this.list.remove().value().toString());
         }
 
         if (this.list.isEmpty()) {

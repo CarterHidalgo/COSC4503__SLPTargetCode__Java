@@ -14,11 +14,13 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import ast.AST;
+import ast.Stm;
+
 public class Parser {
     private static Map<Token.Type, Map<Integer, String>> actionTable = new HashMap<>();
     private static Map<Nonterminal.Type, Map<Integer, Integer>> gotoTable = new HashMap<>();
     private static List<Pair> grammar = new ArrayList<>();
-    private static List<String> ircode = new ArrayList<>();
     private static final Set<String> tokens = Arrays.stream(Token.Type.values()).map(Enum::name)
             .collect(Collectors.toSet());
     private static final Set<String> nonterminals = Arrays.stream(Nonterminal.Type.values()).map(Enum::name)
@@ -88,10 +90,7 @@ public class Parser {
                     continue;
                 }
 
-                String[] parts = line.split(" ;");
-                ircode.add(parts.length > 1 ? parts[1] : "");
-
-                parts = parts[0].split(" ");
+                String[] parts = line.split(" ");
                 List<StackItem> rule = new ArrayList<>();
                 for (int i = 1; i < parts.length; i++) {
                     if (tokens.contains(parts[i])) {
@@ -110,7 +109,7 @@ public class Parser {
         }
     }
 
-    public static boolean parse(Path program) {
+    public static Stm parse(Path program) {
         Lexer lexer = new Lexer(program);
         Stack<StackItem> stack = new Stack<>();
         boolean exception = false;
@@ -120,9 +119,10 @@ public class Parser {
         token = lexer.nextToken();
         stack.push(new Token(Token.Type.INVALID));
         stack.push(new State(0));
+
         while (true) {
             try {
-                state = ((State) stack.peek()).state();
+                state = ((State) stack.peek()).value();
                 String cmd = actionTable.get(token.type()).get(state);
 
                 if (cmd == null) {
@@ -137,9 +137,10 @@ public class Parser {
                         stack.pop();
                         items.add(stack.pop());
                     }
-                    Nonterminal nonterminal = new Nonterminal(grammar.get(rule).first(), Nonterminal.replace(items, ircode.get(rule)));
 
-                    state = ((State) stack.peek()).state();
+                    Nonterminal nonterminal = new Nonterminal(grammar.get(rule).first(), AST.get(rule, items));
+
+                    state = ((State) stack.peek()).value();
                     stack.push(nonterminal);
                     stack.push(new State(gotoTable.get(nonterminal.type()).get(state)));
                 } else if (cmd.startsWith("s")) {
@@ -167,12 +168,9 @@ public class Parser {
 
         if (!exception) {
             stack.pop();
-            Nonterminal result = new Nonterminal(Nonterminal.Type.STM, stack.peek().value() + ";");
-            System.out.println("Stm intermediate = " + result.value());
-
-            return true;
+            return (Stm) stack.peek().value();
         } else {
-            return false;
+            return null;
         }
 
     }

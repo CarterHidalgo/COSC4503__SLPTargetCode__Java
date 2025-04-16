@@ -3,15 +3,15 @@ package visitors;
 import java.util.HashSet;
 import java.util.Set;
 
-import intermediates.AssignStm;
-import intermediates.CompoundStm;
-import intermediates.EseqExp;
-import intermediates.IdExp;
-import intermediates.LastExpList;
-import intermediates.NumExp;
-import intermediates.OpExp;
-import intermediates.PairExpList;
-import intermediates.PrintStm;
+import ast.AssignStm;
+import ast.CompoundStm;
+import ast.EseqExp;
+import ast.IdExp;
+import ast.LastExpList;
+import ast.NumExp;
+import ast.OpExp;
+import ast.PairExpList;
+import ast.PrintStm;
 
 public class TargetCodeVisitor implements Visitor {
     private Set<String> symbols = new HashSet<>();
@@ -26,51 +26,51 @@ public class TargetCodeVisitor implements Visitor {
         data.append("newline: .asciiz \"\\n\"\n");
     }
 
-    public Object visit(CompoundStm compoundStm, Object inh) {
-        compoundStm.stm1.accept(this, inh);
+    public Object visit(CompoundStm compoundStm) {
+        compoundStm.stm1.accept(this);
         text.append("\n");
-        compoundStm.stm2.accept(this, inh);
+        compoundStm.stm2.accept(this);
 
         return null;
     }
 
-    public Object visit(AssignStm assignStm, Object inh) {
-        String reg = (String) assignStm.exp.accept(this, inh);
-        text.append("sw " + reg + ", " + assignStm.id.accept(this, inh) + "\n");
+    public Object visit(AssignStm assignStm) {
+        String reg = (String) assignStm.exp.accept(this);
+        text.append("sw " + reg + ", " + assignStm.id.accept(this) + "\n");
         Registers.add(reg);
 
         return null;
     }
 
-    public Object visit(PrintStm printStm, Object inh) {
-        return printStm.exps.accept(this, inh);
+    public Object visit(PrintStm printStm) {
+        return printStm.exps.accept(this);
     }
 
-    public Object visit(PairExpList pairExpList, Object inh) {
-        String regHead = (String) pairExpList.head.accept(this, inh);
+    public Object visit(PairExpList pairExpList) {
+        String regHead = (String) pairExpList.head.accept(this);
         addPrintCode(regHead);
         Registers.add(regHead);
 
-        Registers.add((String) pairExpList.tail.accept(this, inh));
+        Registers.add((String) pairExpList.tail.accept(this));
 
         return null;
     }
 
-    public Object visit(LastExpList lastExpList, Object inh) {
-        String reg = (String) lastExpList.head.accept(this, inh);
+    public Object visit(LastExpList lastExpList) {
+        String reg = (String) lastExpList.head.accept(this);
         addPrintCode(reg);
         addNewlineCode();
         
         return reg;
     }
 
-    public Object visit(EseqExp eseqExp, Object inh) {
-        eseqExp.stm.accept(this, inh);
+    public Object visit(EseqExp eseqExp) {
+        eseqExp.stm.accept(this);
 
-        return eseqExp.exp.accept(this, inh);
+        return eseqExp.exp.accept(this);
     }
 
-    public Object visit(IdExp idExp, Object inh) {
+    public Object visit(IdExp idExp) {
         if(!symbols.contains(idExp.id)) {
             symbols.add(idExp.id);
             data.append(idExp.id + ": .word 0\n");
@@ -84,16 +84,16 @@ public class TargetCodeVisitor implements Visitor {
         }        
     }
 
-    public Object visit(NumExp numExp, Object inh) {
+    public Object visit(NumExp numExp) {
         String reg = Registers.get();
         text.append("li " + reg + ", " + numExp.num + "\n");
 
         return reg;
     }
 
-    public Object visit(OpExp opExp, Object inh) {
-        String argLeft = (String) opExp.left.accept(this, inh);
-        String argRight = (String) opExp.right.accept(this, inh);
+    public Object visit(OpExp opExp) {
+        String argLeft = (String) opExp.left.accept(this);
+        String argRight = (String) opExp.right.accept(this);
         String result = Registers.get();
         String postfix = result + ", "
                 + argLeft + ", "

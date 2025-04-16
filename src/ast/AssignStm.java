@@ -1,4 +1,4 @@
-package intermediates;
+package ast;
 
 import visitors.Visitor;
 
@@ -11,7 +11,12 @@ public class AssignStm extends Stm {
         this.exp = exp;
     }
 
-    public Object accept(Visitor v, Object inh) {
-        return v.visit(this, inh);
+    public Object accept(Visitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "AssignStm(" + this.id + ", " + this.exp + ")";
     }
 }

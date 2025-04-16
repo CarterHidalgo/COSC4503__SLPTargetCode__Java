@@ -1,4 +1,4 @@
-package intermediates;
+package ast;
 import visitors.Visitor;
 
 public class PairExpList extends ExpList {
@@ -10,7 +10,12 @@ public class PairExpList extends ExpList {
         this.tail = tail;
     }
 
-    public Object accept(Visitor v, Object inh) {
-        return v.visit(this, inh);
+    public Object accept(Visitor v) {
+        return v.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "PairExpList(" + this.head + ", " + this.tail + ")";
     }
 }

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import parser.StackItem;
-import parser.Token;
 
 public class AST {
     private static final Map<Integer, Function<List<StackItem>, Object>> astCode = new HashMap<>();
@@ -16,7 +15,7 @@ public class AST {
         astCode.put(1, args -> new AssignStm(new IdExp((String) args.get(2).value()), (Exp) args.get(0).value()));
         astCode.put(2, args -> new PrintStm((ExpList) args.get(1).value()));
         astCode.put(4, args -> new IdExp((String) args.get(0).value()));
-        astCode.put(5, args -> new NumExp(Integer.valueOf(((Token) args.get(0)).value().toString())));
+        astCode.put(5, args -> new NumExp(Integer.valueOf(args.get(0).value().toString())));
         astCode.put(6, args -> new OpExp((Exp) args.get(2).value(), (int) args.get(1).value(), (Exp) args.get(0).value()));
         astCode.put(7, args -> new EseqExp((Stm) args.get(3).value(), (Exp) args.get(1).value()));
         astCode.put(8, args -> new PairExpList((Exp) args.get(2).value(), (ExpList) args.get(0).value()));

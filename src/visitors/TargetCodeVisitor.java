@@ -37,7 +37,6 @@ public class TargetCodeVisitor implements Visitor {
     public Object visit(AssignStm assignStm) {
         String reg = (String) assignStm.exp.accept(this);
         text.append("sw " + reg + ", " + assignStm.id.accept(this) + "\n");
-        Registers.add(reg);
 
         return null;
     }
@@ -49,9 +48,7 @@ public class TargetCodeVisitor implements Visitor {
     public Object visit(PairExpList pairExpList) {
         String regHead = (String) pairExpList.head.accept(this);
         addPrintCode(regHead);
-        Registers.add(regHead);
-
-        Registers.add((String) pairExpList.tail.accept(this));
+        pairExpList.tail.accept(this);
 
         return null;
     }
